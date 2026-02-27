@@ -1,13 +1,10 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
+  "/page": "app/page.js",
+  "/dashboard/admin/users/page": "app/dashboard/admin/users/page.js",
   "/dashboard/admin/page": "app/dashboard/admin/page.js",
   "/(auth)/login/page": "app/(auth)/login/page.js",
   "/(marketplace)/services/page": "app/(marketplace)/services/page.js",
-  "/cart/page": "app/cart/page.js",
-  "/(marketplace)/services/[id]/page": "app/(marketplace)/services/[id]/page.js",
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/page": "app/page.js",
-  "/api/cart/[id]/route": "app/api/cart/[id]/route.js",
-  "/api/cart/route": "app/api/cart/route.js",
   "/api/services/route": "app/api/services/route.js"
 }
