@@ -3,7 +3,7 @@
     "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-styles_components_button_css-styles_components_navbar_css-styles_components_service-card_-39fa08.css",
+      "static/css/css-styles_components_button_css-styles_components_navbar_css-styles_components_service-card_-9ccbff.css",
       "static/chunks/app/page.js"
     ],
     "/layout": [
@@ -15,14 +15,13 @@
     "/(auth)/login/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-styles_components_button_css-styles_components_navbar_css-styles_components_service-card_-39fa08.css",
+      "static/css/css-styles_components_button_css-styles_components_navbar_css-styles_components_service-card_-9ccbff.css",
       "static/chunks/app/(auth)/login/page.js"
     ],
-    "/(marketplace)/services/page": [
+    "/_not-found/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-styles_components_button_css-styles_components_navbar_css-styles_components_service-card_-39fa08.css",
-      "static/chunks/app/(marketplace)/services/page.js"
+      "static/chunks/app/_not-found/page.js"
     ]
   }
 }
