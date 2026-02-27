@@ -1,7 +1,8 @@
 // components/dashboard/admin/AdminUsersTable.tsx
 "use client";
 
-import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import "@/styles/pages/dashboard.css";
 
 type UserRow = {
@@ -13,18 +14,49 @@ type UserRow = {
   status?: "active" | "suspended" | "banned";
   createdAt?: string | Date;
   avatar?: string;
+  deletedAt?: string | Date; // needed for Delete/Restore UI
 };
 
+type ApiResp = { ok: boolean; data?: any; error?: string };
+
+async function apiCall(url: string, method: string, body?: any): Promise<boolean> {
+  const res = await fetch(url, {
+    method,
+    headers: body ? { "Content-Type": "application/json" } : undefined,
+    body: body ? JSON.stringify(body) : undefined,
+  });
+
+  if (!res.ok) return false;
+
+  const json = (await res.json().catch(() => null)) as ApiResp | null;
+  return json ? json.ok !== false : true;
+}
+
 export default function AdminUsersTable({ users }: { users: UserRow[] }) {
+  const router = useRouter();
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  async function run(id: string, fn: () => Promise<boolean>) {
+    if (busyId) return;
+    setBusyId(id);
+    try {
+      const ok = await fn();
+      if (ok) router.refresh();
+    } finally {
+      setBusyId(null);
+    }
+  }
+
   return (
     <div className="dashboard-card">
       <div className="dashboard-card__header">
         <div className="dashboard-card__title">All users</div>
         <div className="dashboard-card__meta">{users.length} total</div>
 
-        <Link className="dashboard-btn" href="/dashboard/admin/users/new">
+        {/* placeholder: luego modal */}
+        <button className="dashboard-btn" type="button" disabled>
           Create user
-        </Link>
+        </button>
       </div>
 
       <div className="dashboard-table__wrap">
@@ -46,9 +78,11 @@ export default function AdminUsersTable({ users }: { users: UserRow[] }) {
               const id = u._id?.toString?.() ?? String(u._id);
               const created = u.createdAt ? new Date(u.createdAt).toISOString().slice(0, 10) : "—";
               const status = u.status ?? "active";
+              const isDeleted = Boolean(u.deletedAt);
+              const isBusy = busyId === id;
 
               return (
-                <tr key={id} className={status !== "active" ? "row-muted" : ""}>
+                <tr key={id} className={status !== "active" || isDeleted ? "row-muted" : ""}>
                   <td>
                     <div className="user-cell">
                       <div className="user-cell__avatar">
@@ -79,9 +113,63 @@ export default function AdminUsersTable({ users }: { users: UserRow[] }) {
                   <td>{created}</td>
 
                   <td style={{ textAlign: "right" }}>
-                    <Link className="dashboard-link" href={`/dashboard/admin/users/${id}`}>
-                      Manage
-                    </Link>
+                    <div className="row-actions">
+                      <button
+                        className="dashboard-action"
+                        disabled={isBusy || isDeleted || status === "banned"}
+                        onClick={() =>
+                          run(id, () =>
+                            apiCall(
+                              `/api/admin/users/${id}/suspend`,
+                              "PATCH",
+                              status === "suspended"
+                                ? { action: "unsuspend" }
+                                : { action: "suspend", days: 7 }
+                            )
+                          )
+                        }
+                      >
+                        {status === "suspended" ? "Unsuspend" : "Suspend"}
+                      </button>
+
+                      <button
+                        className="dashboard-action"
+                        disabled={isBusy || isDeleted}
+                        onClick={() =>
+                          run(id, () =>
+                            apiCall(
+                              `/api/admin/users/${id}/ban`,
+                              "PATCH",
+                              status === "banned"
+                                ? { action: "unban" }
+                                : { action: "ban", reason: "Admin action" }
+                            )
+                          )
+                        }
+                      >
+                        {status === "banned" ? "Unban" : "Ban"}
+                      </button>
+
+                      {!isDeleted ? (
+                        <button
+                          className="dashboard-action dashboard-action--danger"
+                          disabled={isBusy}
+                          onClick={() => run(id, () => apiCall(`/api/admin/users/${id}`, "DELETE"))}
+                        >
+                          Delete
+                        </button>
+                      ) : (
+                        <button
+                          className="dashboard-action"
+                          disabled={isBusy}
+                          onClick={() =>
+                            run(id, () => apiCall(`/api/admin/users/${id}/restore`, "PATCH"))
+                          }
+                        >
+                          Restore
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               );
