@@ -1,6 +1,14 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
+  "/api/cart/route": "app/api/cart/route.js",
+  "/dashboard/admin/page": "app/dashboard/admin/page.js",
   "/page": "app/page.js",
   "/(auth)/login/page": "app/(auth)/login/page.js",
-  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js"
+  "/dashboard/vendor/page": "app/dashboard/vendor/page.js",
+  "/dashboard/buyer/page": "app/dashboard/buyer/page.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/api/orders/my/route": "app/api/orders/my/route.js",
+  "/(auth)/register/page": "app/(auth)/register/page.js",
+  "/api/auth/register/route": "app/api/auth/register/route.js",
+  "/api/services/route": "app/api/services/route.js"
 }

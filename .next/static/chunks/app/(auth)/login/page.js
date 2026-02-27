@@ -735,7 +735,7 @@ eval(__webpack_require__.ts("// TODO(Babel 8): Remove this file.\n\nvar runtime 
 },
 /******/ function(__webpack_require__) { // webpackRuntimeModules
 /******/ var __webpack_exec__ = function(moduleId) { return __webpack_require__(__webpack_require__.s = moduleId); }
-/******/ __webpack_require__.O(0, ["css-styles_components_button_css-styles_components_navbar_css-styles_components_service-card_-9ccbff","main-app"], function() { return __webpack_exec__("(app-pages-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-client-entry-loader.js?modules=%7B%22request%22%3A%22D%3A%5C%5C1.Portafolio%5C%5CtesteIA%5C%5CNew-test-repo-%5C%5Capp%5C%5C(auth)%5C%5Clogin%5C%5Cpage.tsx%22%2C%22ids%22%3A%5B%5D%7D&server=false!"); });
+/******/ __webpack_require__.O(0, ["css-styles_components_button_css-styles_components_navbar_css-styles_components_service-card_-2d09c1","main-app"], function() { return __webpack_exec__("(app-pages-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-client-entry-loader.js?modules=%7B%22request%22%3A%22D%3A%5C%5C1.Portafolio%5C%5CtesteIA%5C%5CNew-test-repo-%5C%5Capp%5C%5C(auth)%5C%5Clogin%5C%5Cpage.tsx%22%2C%22ids%22%3A%5B%5D%7D&server=false!"); });
 /******/ var __webpack_exports__ = __webpack_require__.O();
 /******/ _N_E = __webpack_exports__;
 /******/ }

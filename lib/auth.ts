@@ -29,11 +29,14 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email || !credentials?.password) return null;
 
         await connectDB();
+        
         const user = await UserModel.findOne({ email: credentials.email }).select("+password");
+       
 
         if (!user || !user.password) return null;
 
         const isValid = await bcrypt.compare(credentials.password, user.password);
+        
         if (!isValid) return null;
 
         return {
