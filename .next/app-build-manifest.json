@@ -3,7 +3,7 @@
     "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-styles_components_button_css-styles_components_navbar_css-styles_components_service-card_-2d09c1.css",
+      "static/css/css-styles_components_button_css-styles_components_navbar_css-styles_components_service-card_-bf5f45.css",
       "static/chunks/app/page.js"
     ],
     "/layout": [
@@ -15,44 +15,32 @@
     "/(auth)/login/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-styles_components_button_css-styles_components_navbar_css-styles_components_service-card_-2d09c1.css",
+      "static/css/css-styles_components_button_css-styles_components_navbar_css-styles_components_service-card_-bf5f45.css",
       "static/chunks/app/(auth)/login/page.js"
     ],
     "/dashboard/admin/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-styles_components_button_css-styles_components_navbar_css-styles_components_service-card_-2d09c1.css",
+      "static/css/css-styles_components_button_css-styles_components_navbar_css-styles_components_service-card_-bf5f45.css",
       "static/chunks/app/dashboard/admin/page.js"
-    ],
-    "/dashboard/buyer/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/css-styles_components_button_css-styles_components_navbar_css-styles_components_service-card_-2d09c1.css",
-      "static/chunks/app/dashboard/buyer/page.js"
-    ],
-    "/dashboard/vendor/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/css-styles_components_button_css-styles_components_navbar_css-styles_components_service-card_-2d09c1.css",
-      "static/chunks/app/dashboard/vendor/page.js"
     ],
     "/(marketplace)/services/[id]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-styles_components_button_css-styles_components_navbar_css-styles_components_service-card_-2d09c1.css",
+      "static/css/css-styles_components_button_css-styles_components_navbar_css-styles_components_service-card_-bf5f45.css",
       "static/chunks/app/(marketplace)/services/[id]/page.js"
+    ],
+    "/cart/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/css-styles_components_button_css-styles_components_navbar_css-styles_components_service-card_-bf5f45.css",
+      "static/chunks/app/cart/page.js"
     ],
     "/(marketplace)/services/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/css-styles_components_button_css-styles_components_navbar_css-styles_components_service-card_-2d09c1.css",
+      "static/css/css-styles_components_button_css-styles_components_navbar_css-styles_components_service-card_-bf5f45.css",
       "static/chunks/app/(marketplace)/services/page.js"
-    ],
-    "/(auth)/register/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/css-styles_components_button_css-styles_components_navbar_css-styles_components_service-card_-2d09c1.css",
-      "static/chunks/app/(auth)/register/page.js"
     ],
     "/_not-found/page": [
       "static/chunks/webpack.js",

@@ -7,6 +7,9 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import "@/styles/components/navbar.css";
 
+import { CartButton } from "@/components/layout/CartButton";
+
+
 interface SearchResult {
   _id: string;
   title: string;
