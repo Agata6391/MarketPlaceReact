@@ -41,16 +41,16 @@ export const authOptions: NextAuthOptions = {
 
         if (!user || !user.password) return null;
 
-        // NEW: block if deleted / banned / suspended
-        if ((user as any).deletedAt) return null;
+       // NEW: block if deleted / banned / suspended (with explicit error codes)
+if ((user as any).deletedAt) throw new Error("ACCOUNT_DELETED");
 
-        if ((user as any).status === "banned") return null;
+if ((user as any).status === "banned") throw new Error("ACCOUNT_BANNED");
 
-        if ((user as any).status === "suspended") {
-          const until = (user as any).suspendedUntil as Date | undefined;
-          if (!until) return null; // indefinite suspension
-          if (until > new Date()) return null; // still suspended
-        }
+if ((user as any).status === "suspended") {
+  const until = (user as any).suspendedUntil as Date | undefined;
+  if (!until) throw new Error("ACCOUNT_SUSPENDED");
+  if (until > new Date()) throw new Error(`ACCOUNT_SUSPENDED_UNTIL:${until.toISOString()}`);
+}
 
         const isValid = await bcrypt.compare(credentials.password, user.password);
         if (!isValid) return null;

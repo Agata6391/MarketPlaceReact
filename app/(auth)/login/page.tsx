@@ -25,14 +25,33 @@ export default function LoginPage() {
       email: form.email,
       password: form.password,
       redirect: false,
-    });
+    })
+    ;if (result?.error) {
+  const e = result.error;
 
-    if (result?.error) {
-      setError("Invalid email or password");
-      setLoading(false);
-    } else {
-      router.push(callbackUrl);
-    }
+  if (e === "ACCOUNT_BANNED") setError("Your account is banned.Please contact support.");
+  else if (e === "ACCOUNT_DELETED") setError("Your account is inactive.");
+  else if (e === "ACCOUNT_SUSPENDED") setError("Your account is suspended. Please contact support.");
+  else if (e.startsWith("ACCOUNT_SUSPENDED_UNTIL:")) {
+    const iso = e.split("ACCOUNT_SUSPENDED_UNTIL:")[1];
+    const d = new Date(iso);
+    setError(`Your account is suspended until ${d.toLocaleString()}.`);
+  } else {
+    setError("Invalid email or password");
+  }
+
+  setLoading(false);
+  return;
+}
+
+router.push(callbackUrl);
+
+    // if (result?.error) {
+    //   setError("Invalid email or password");
+    //   setLoading(false);
+    // } else {
+    //   router.push(callbackUrl);
+    // }
   }
 
   return (

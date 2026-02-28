@@ -28,9 +28,14 @@ export async function POST(req: NextRequest) {
     const user = await UserModel.create({
       name,
       email,
-      password,        // bcrypt hashing is handled in the model pre-save hook
+      password, // bcrypt hashing is handled in the model pre-save hook
       role: userRole,
       provider: "credentials",
+      status: "active", // NEW
+      suspendedUntil: null, // optional
+      bannedAt: null, // optional
+      banReason: null, // optional
+      deletedAt: null, // optional
     });
 
     return apiSuccess(
@@ -40,7 +45,7 @@ export async function POST(req: NextRequest) {
         email: user.email,
         role: user.role,
       },
-      201
+      201,
     );
   } catch (err: any) {
     console.error("[REGISTER]", err);
