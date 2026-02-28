@@ -1,8 +1,8 @@
 {
-  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
   "/dashboard/admin/users/page": "app/dashboard/admin/users/page.js",
-  "/api/admin/users/[id]/route": "app/api/admin/users/[id]/route.js",
-  "/api/admin/users/[id]/ban/route": "app/api/admin/users/[id]/ban/route.js",
-  "/api/admin/users/[id]/suspend/route": "app/api/admin/users/[id]/suspend/route.js",
-  "/api/admin/users/[id]/restore/route": "app/api/admin/users/[id]/restore/route.js"
+  "/(auth)/login/page": "app/(auth)/login/page.js",
+  "/page": "app/page.js",
+  "/dashboard/admin/page": "app/dashboard/admin/page.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/dashboard/vendor/page": "app/dashboard/vendor/page.js"
 }
