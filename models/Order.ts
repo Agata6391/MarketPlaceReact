@@ -1,4 +1,4 @@
-// models/Order.ts  — reemplaza el archivo existente
+// models/Order.ts
 import mongoose from "mongoose";
 
 const ProgressUpdateSchema = new mongoose.Schema({
@@ -15,20 +15,23 @@ const OrderSchema = new mongoose.Schema(
     service: { type: mongoose.Schema.Types.ObjectId, ref: "Service", required: true },
 
     tierName:     { type: String, required: true },
-    tierPrice:    { type: Number, required: true },  // en centavos
+    tierPrice:    { type: Number, required: true },
     deliveryDays: { type: Number },
 
     status: {
       type: String,
-      enum: ["pending", "paid", "in_progress", "delivered", "completed", "cancelled", "refunded"],
+      enum: [
+        "pending", "paid", "in_progress", "delivered",
+        "completed", "cancelled", "refunded",
+        "cancellation_requested",   // ← nuevo
+      ],
       default: "pending",
     },
 
-    // Historial de avances — vendor y admin pueden agregar entradas
-    progressUpdates: [ProgressUpdateSchema],
-
-    // Nota interna del admin
-    notes: { type: String },
+    progressUpdates:          [ProgressUpdateSchema],
+    notes:                    { type: String },
+    cancellationReason:       { type: String },         // motivo que envió el comprador
+    statusBeforeCancellation: { type: String },         // para revertir si vendor rechaza
 
     stripePaymentIntentId: { type: String },
     stripeSessionId:       { type: String },

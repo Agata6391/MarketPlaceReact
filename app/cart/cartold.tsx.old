@@ -7,7 +7,6 @@ import { CartModel } from "@/models/Cart";
 import { Button } from "@/components/ui/Button";
 import "@/styles/pages/cart.css";
 import { RemoveCartItemButton } from "@/components/cart/RemoveCartItemButton";
-import { CheckoutButton } from "@/components/cart/CheckoutButton";
 
 export default async function CartPage() {
   const session = await getServerSession(authOptions);
@@ -22,6 +21,7 @@ export default async function CartPage() {
                 <h1 className="cart__title">Cart</h1>
                 <p className="cart__subtitle">Sign in to view your cart.</p>
               </div>
+
               <Link href="/login">
                 <Button>Sign In</Button>
               </Link>
@@ -33,6 +33,7 @@ export default async function CartPage() {
   }
 
   const userId = (session.user as any).id;
+
   await connectDB();
 
   const cart = await CartModel.findOne({ user: userId })
@@ -40,8 +41,6 @@ export default async function CartPage() {
     .lean();
 
   const items = cart?.items ?? [];
-
-  // Los precios están en centavos — dividir entre 100 para mostrar en USD
   const total = items.reduce(
     (sum: number, it: any) => sum + (Number(it.tierPrice) || 0),
     0,
@@ -65,7 +64,9 @@ export default async function CartPage() {
               <Link href="/services">
                 <Button variant="secondary">Browse services</Button>
               </Link>
-              <CheckoutButton disabled={items.length === 0} />
+              <Link href="/checkout">
+                <Button disabled={items.length === 0}>Checkout</Button>
+              </Link>
             </div>
           </div>
 
@@ -102,21 +103,21 @@ export default async function CartPage() {
                           <Link className="cart-item__title" href={href}>
                             {title}
                           </Link>
+
                           <div className="cart-item__meta">
                             <span className="cart-item__pill">
                               {it.tierName}
                             </span>
                             {it.deliveryDays != null && (
                               <span className="cart-item__muted">
-                                {it.deliveryDays} days delivery
+                                {it.deliveryDays} days
                               </span>
                             )}
                           </div>
                         </div>
 
-                        {/* precio en centavos → dividir entre 100 */}
                         <div className="cart-item__price">
-                          ${(Number(it.tierPrice) / 100).toFixed(2)}
+                          ${Number(it.tierPrice).toFixed(2)}
                         </div>
 
                         <div className="cart-item__actions">
@@ -135,9 +136,7 @@ export default async function CartPage() {
 
                 <div className="summary__row">
                   <span className="summary__label">Subtotal</span>
-                  <span className="summary__value">
-                    ${(total / 100).toFixed(2)}
-                  </span>
+                  <span className="summary__value">${total.toFixed(2)}</span>
                 </div>
 
                 <div className="summary__row">
@@ -149,13 +148,15 @@ export default async function CartPage() {
 
                 <div className="summary__row summary__row--total">
                   <span className="summary__label">Total</span>
-                  <span className="summary__value">
-                    ${(total / 100).toFixed(2)}
-                  </span>
+                  <span className="summary__value">${total.toFixed(2)}</span>
                 </div>
 
                 <div className="summary__actions">
-                  <CheckoutButton fullWidth disabled={items.length === 0} />
+                  <Link href="/checkout">
+                    <Button fullWidth disabled={items.length === 0}>
+                      Checkout
+                    </Button>
+                  </Link>
                   <Link href="/services">
                     <Button fullWidth variant="secondary">
                       Continue browsing
