@@ -1,49 +1,94 @@
+"use client";
+
+// components/marketplace/ServiceCard.tsx
+// Client component para poder manejar el estado del favorito
+
 import Link from "next/link";
 import Image from "next/image";
-import "@/styles/components/service-card.css";
+import { useState } from "react";
+import { useSession } from "next-auth/react";
+import "@/styles/services/services.css";
 
 const CATEGORY_ICONS: Record<string, string> = {
-  design: "🎨",
-  development: "💻",
-  marketing: "📣",
-  writing: "✍️",
-  video: "🎬",
-  music: "🎵",
-  business: "💼",
-  other: "⚡",
+  design: "🎨", development: "💻", marketing: "📣",
+  writing: "✍️", video: "🎬", music: "🎵", business: "💼", other: "⚡",
 };
 
-interface ServiceCardProps {
+interface Props {
   service: {
-    _id: string;
-    title: string;
-    category: string;
-    thumbnail?: string;
-    tiers: Array<{ name: string; price: number }>;
-    vendor: { name: string; avatar?: string };
-    rating: number;
-    reviewCount: number;
-    isFeatured?: boolean;
+    _id:          string;
+    title:        string;
+    slug?:        string;
+    category:     string;
+    thumbnail?:   string;
+    tiers:        Array<{ name: string; price: number }>;
+    vendor:       { name: string; avatar?: string };
+    rating:       number;
+    reviewCount:  number;
+    isFeatured?:  boolean;
   };
+  initialFaved?: boolean;
 }
 
-export function ServiceCard({ service }: ServiceCardProps) {
-  const minPrice = Math.min(...service.tiers.map((t) => t.price));
+export function ServiceCard({ service, initialFaved = false }: Props) {
+  const { data: session } = useSession();
+  const user              = session?.user as any;
+
+  const [faved,    setFaved]    = useState(initialFaved);
+  const [favLoading, setFavLoading] = useState(false);
+
+  const minPrice = service.tiers?.length
+    ? Math.min(...service.tiers.map(t => t.price))
+    : 0;
+
+  const href = `/services/${service.slug || service._id}`;
+
+  async function toggleFav(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!session) { window.location.href = "/login"; return; }
+    if (favLoading) return;
+
+    setFavLoading(true);
+    if (faved) {
+      // Para eliminar necesitamos el favoriteId — simplificamos buscando por service
+      await fetch(`/api/favorites?serviceId=${service._id}`, { method: "DELETE" });
+      setFaved(false);
+    } else {
+      const res  = await fetch("/api/favorites", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ serviceId: service._id }),
+      });
+      if (res.ok) setFaved(true);
+    }
+    setFavLoading(false);
+  }
+
+  const canFav = user && (user.role === "buyer" || user.role === "vendor");
 
   return (
-    <Link href={`/services/${service._id}`} style={{ textDecoration: "none" }}>
+    <Link href={href} style={{ textDecoration: "none", display: "block" }}>
       <article className="service-card">
         {/* Thumbnail */}
         <div className="service-card__thumb">
-          {service.thumbnail ? (
-            <Image src={service.thumbnail} alt={service.title} fill style={{ objectFit: "cover" }} />
-          ) : (
-            <div className="service-card__thumb-placeholder">
-              {CATEGORY_ICONS[service.category] ?? "⚡"}
-            </div>
-          )}
+          {service.thumbnail
+            ? <Image src={service.thumbnail} alt={service.title} fill style={{ objectFit: "cover" }} />
+            : <span>{CATEGORY_ICONS[service.category] ?? "⚡"}</span>
+          }
           {service.isFeatured && (
             <span className="service-card__featured-badge">⭐ Featured</span>
+          )}
+          {/* Fav button */}
+          {canFav && (
+            <button
+              className={`service-card__fav-btn${faved ? " service-card__fav-btn--active" : ""}`}
+              onClick={toggleFav}
+              title={faved ? "Quitar de favoritos" : "Guardar en favoritos"}
+              disabled={favLoading}
+            >
+              {faved ? "❤️" : "🤍"}
+            </button>
           )}
         </div>
 
@@ -53,13 +98,12 @@ export function ServiceCard({ service }: ServiceCardProps) {
 
           <div className="service-card__vendor">
             <div className="service-card__vendor-avatar">
-              {service.vendor.avatar ? (
-                <Image src={service.vendor.avatar} alt={service.vendor.name} width={24} height={24} />
-              ) : (
-                service.vendor.name?.[0]?.toUpperCase()
-              )}
+              {service.vendor?.avatar
+                ? <Image src={service.vendor.avatar} alt={service.vendor.name} width={22} height={22} />
+                : (service.vendor?.name?.[0] ?? "V").toUpperCase()
+              }
             </div>
-            {service.vendor.name}
+            {service.vendor?.name}
           </div>
 
           <h3 className="service-card__title">{service.title}</h3>
