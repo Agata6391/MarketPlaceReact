@@ -13,13 +13,15 @@
 
 ## ✨ Features
 
-**New/Enhanced:**
-- **Vendor Dashboard** (`/dashboard/vendor/*`): Overview, Services management, Orders received (`OrdersManager role="vendor"`), Purchases (`asBuyer=true`)
-- **Buyer Dashboard** (`/dashboard/buyer/*`): Overview, Purchases (`OrdersManager role="buyer"`)
-- **Admin Dashboard** (`/dashboard/admin/*`): Overview, Orders, Users (ban/suspend/restore/password)
-- **OrdersManager Component**: Role-aware table/modal with status workflow (pending/paid/in_progress/delivered/completed/cancelled/refunded), progress updates timeline, buyer cancellation requests, filters/search/pagination
-- **API/services**: GET with ?vendor=ID filter, text search (?q=), pagination, featured
-- **Full Models**: User (roles), Service (tiers, categories enum, vendor, text index), Order (progressUpdates[], cancellationReason), Cart (multi-item), Review (avg rating)
+**Marketplace Particularities:**
+- **Services**: Browse/filter by category (enum: design/development/marketing/etc.), vendor (?vendor=ID), text search (?q=), featured/pagination. Detail view with tiers/pricing/reviews (avg rating via models/Review).
+- **Dashboards (Role-based)**: 
+  - Admin (`/dashboard/admin/*`): Users mgmt (ban/suspend/restore/password), services/orders/reviews/analytics tables.
+  - Buyer (`/dashboard/buyer/*`): Orders (`BuyerOrdersList`), favorites (`FavoritesClient`), settings.
+  - Vendor: Services (`AdminServicesManager` adapted), received orders (`OrdersManager`).
+- **Order Workflow**: Statuses (pending/paid/in_progress/delivered/completed/cancelled/refunded), progress timeline, cancellation requests. Role-aware `OrdersManager.tsx`.
+- **Cart/Checkout**: Multi-item cart, Stripe integration (checkout/webhook).
+- **Full Models**: User (roles: admin/buyer/vendor), Service (tiers/categories/vendor/indexed), Order (progressUpdates/cancellationReason), Cart/Favorite/Review.
 
 **Core:**
 - Marketplace: Browse/filter/search, detail/tiers/reviews
@@ -84,10 +86,9 @@ CLOUDINARY_URL= (for images)
 ```
 
 ### 3. Database Setup
-```bash
-npm run db:setup  # Creates indexes/collections
-npm run seed      # Seed sample data
-```
+Connect MongoDB Atlas/local (models/ TS + lib/db.ts). Run migrations/indexes if needed (manual via Mongo shell/Compass).
+**Sample Data**: Register test accounts or insert via API/UI.
+
 
 ### 4. Run Development
 ```bash
@@ -104,24 +105,25 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ## 🏗️ Project Structure
 
-**New:**
-- app/dashboard/vendor/orders/page.tsx - Vendor received orders
-- app/dashboard/vendor/purchases/page.tsx - Vendor purchases (as buyer)
-- app/dashboard/vendor/services/ - Vendor services (inferred)
-- components/dashboard/shared/OrdersManager.tsx - Advanced order UI
-- app/api/orders/[id] - Order PATCH (status/progress)
-- components/cart/CheckoutButton.tsx + RemoveCartItemButton.tsx
+**Key Marketplace Files:**
+```
+app/(marketplace)/          # Services listing (inferred group)
+├── components/marketplace/
+│   ├── ServiceCard.tsx
+│   └── ServiceDetailClient.tsx
+app/cart/page.tsx           # Multi-item cart UI
+├── components/cart/
+│   ├── CheckoutButton.tsx
+│   └── RemoveCartItemButton.tsx
+app/dashboard/              # Role-based dashboards
+├── admin/users/page.tsx    # User moderation
+├── buyer/orders/page.tsx   # BuyerOrdersList
+└── components/shared/OrdersManager.tsx  # Workflow UI
+models/Service.ts           # Tiers/categories/indexed
+app/api/services/route.ts   # Search/filter API (?q= ?vendor=)
+```
+**Full structure**: See repo root listing.
 
-```
-├── app/
-│   ├── dashboard/vendor/orders/page.tsx (NEW)
-│   ├── dashboard/vendor/purchases/page.tsx (NEW)
-│   ├── dashboard/admin/users/page.tsx
-│   ├── components/dashboard/shared/OrdersManager.tsx (NEW)
-│   └── api/orders/my/route.ts
-├── models/Order.ts (enhanced: progressUpdates, statuses)
-└── ... (full recursive structure in env details)
-```
 
 ## 🚀 Deployment
 
@@ -141,16 +143,17 @@ npm run start
 
 ## 🔍 API Endpoints (Updated)
 
-| Endpoint | Method | Description | Auth | New |
-|----------|--------|-------------|------|-----|
-| `/api/services` | GET | ?q=text ?category ?featured ?vendor=ID page/limit | - | ✓ |
-| `/api/services` | POST | Create service | vendor/admin | |
-| `/api/orders` | GET | List (role-filtered) ?status ?search limit=100 | admin/vendor | ✓ |
-| `/api/orders/my` | GET | Personal orders ?as=buyer | user | |
-| `/api/orders/[id]` | GET/PATCH | Detail, update status/progress/cancel | parties/admin | ✓ |
-| `/api/cart` | GET/POST/DEL | Add/view/clear | user | |
-| `/api/payments/checkout` | POST | Stripe session | user | |
-| `/api/admin/users/[id]/ban` | POST | Ban | admin | |
+| Endpoint | Method | Description | Auth | 
+|----------|--------|-------------|------| 
+| `/api/services` | GET | List ?q= ?category ?vendor=ID ?featured page/limit | Public | 
+| `/api/services/[id]` | GET/PUT/DEL | Detail/CRUD | Owner/Admin | 
+| `/api/cart` | GET/POST/DELETE | View/add/remove | Buyer | 
+| `/api/orders/my` | GET | Personal ?status page/limit | User | 
+| `/api/orders/[id]` | PATCH | Update status/progress | Owner/Admin | 
+| `/api/favorites` | POST/GET/DELETE | Manage favorites | Buyer | 
+| `/api/reviews` | POST/GET | Create/list (avg rating) | Buyer | 
+| `/api/payments/checkout` | POST | Stripe session | Buyer | 
+| `/api/admin/users/[id]/ban` | POST | +suspend/restore/password | Admin | 
 
 
 ## 🤝 Contributing
