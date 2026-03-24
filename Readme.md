@@ -7,7 +7,7 @@
 
 ## 🚀 Overview
 
-**Skillora** is a full-stack freelance marketplace platform built with Next.js 14 App Router. Buyers can browse services across categories (design, development, marketing, etc.), add to cart, checkout with Stripe, and manage purchases. Vendors can sell skills, admins manage users/services/orders.
+**Octupus** is a full-stack freelance marketplace platform built with Next.js 14 App Router. Buyers can browse services across categories (design, development, marketing, etc.), add to cart, checkout with Stripe, and manage purchases. Vendors can sell skills, admins manage users/services/orders.
 
 **Live Demo**: [TBD]
 
@@ -62,7 +62,7 @@ Copy `.env.local.example` to `.env.local` and fill:
 
 ```env
 # MongoDB
-MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/skillora
+MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/octupus
 
 # NextAuth (production)
 NEXTAUTH_URL=http://localhost:3000

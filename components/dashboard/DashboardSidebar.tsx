@@ -30,7 +30,7 @@ export function DashboardSidebar({ navItems, title }: Props) {
 
       {/* Logo */}
       <Link href="/" className="sidebar__logo">
-        Skill<span>ora</span>
+        Octu<span>pus</span>
       </Link>
 
       {/* Nav */}

@@ -59,7 +59,7 @@ export default async function BuyerOverviewPage() {
         <div className="dashboard__topbar">
           <div className="dashboard__topbar-left">
             <h1 className="dashboard__topbar-title">Hola, {user.name?.split(" ")[0]} 👋</h1>
-            <p className="dashboard__topbar-subtitle">Tu actividad en Skillora</p>
+            <p className="dashboard__topbar-subtitle">Tu actividad en Octupus</p>
           </div>
           <div className="dashboard__topbar-actions">
             <a href="/services" className="btn btn--primary btn--sm">Explorar servicios</a>

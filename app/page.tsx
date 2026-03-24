@@ -174,7 +174,7 @@ export default async function HomePage() {
           <div className="featured-banner">
             <div className="featured-banner__text">
               <h2>Start selling your skills today</h2>
-              <p>Join thousands of freelancers earning on Skillora. Set your rates, showcase your portfolio, and get hired.</p>
+earning on Octupus. Set your rates, showcase your portfolio, and get hired.
             </div>
             <Link href="/register?role=vendor" className="btn btn--primary btn--lg">
               Become a Vendor

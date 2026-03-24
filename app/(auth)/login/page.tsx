@@ -61,7 +61,7 @@ router.push(callbackUrl);
         <div className="auth-page__visual-bg" />
         <div className="auth-page__visual-grid" />
         <div className="auth-page__visual-content">
-          <p className="auth-page__visual-logo">Skill<span>ora</span></p>
+          <p className="auth-page__visual-logo">Octu<span>pus</span></p>
           <p className="auth-page__visual-tagline">
             The marketplace where talent meets opportunity.
           </p>

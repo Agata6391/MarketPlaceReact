@@ -89,7 +89,7 @@ export function Navbar() {
       <div className="container navbar__inner">
         {/* Logo */}
         <Link href="/" className="navbar__logo">
-          Skill<span>ora</span>
+          Octu<span>pus</span>
         </Link>
 
         {/* Search */}

@@ -1,5 +1,5 @@
 /**
- * SEED SCRIPT — Skillora Marketplace
+ * SEED SCRIPT — Octupus Marketplace
  * Uso: npm run seed
  */
 
@@ -123,7 +123,7 @@ const Cart    = mongoose.model("Cart",    CartSchema);
 
 // ── DATOS ────────────────────────────────────────────────
 
-const ADMIN   = { name: "Admin",          email: "admin@skillora.com", password: "Admin1234!",  role: "admin",  provider: "credentials" };
+const ADMIN   = { name: "Admin",          email: "admin@octupus.com", password: "Admin1234!",  role: "admin",  provider: "credentials" };
 const VENDORS = [
   { name: "Maria Garcia",  email: "maria@example.com",  password: "Vendor1234!", role: "vendor", provider: "credentials" },
   { name: "Carlos Lopez",  email: "carlos@example.com", password: "Vendor1234!", role: "vendor", provider: "credentials" },

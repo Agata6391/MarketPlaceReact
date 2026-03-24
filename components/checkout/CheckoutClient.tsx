@@ -154,7 +154,7 @@ export function CheckoutClient({ items, total, userName, userEmail, userRole }: 
         <Link href="/cart" style={styles.backLink}>
           ← Volver al carrito
         </Link>
-        <span style={styles.logo}>Skill<span style={{ color: "var(--color-primary)" }}>ora</span></span>
+          <span style={styles.logo}>Octu<span style={{ color: "var(--color-primary)" }}>pus</span></span>
       </div>
 
       <div style={styles.layout}>
@@ -390,7 +390,7 @@ export function CheckoutClient({ items, total, userName, userEmail, userRole }: 
             <div style={styles.guaranteeBadge}>
               <span>🛡️</span>
               <span style={{ fontSize: "0.8rem", color: "var(--color-text-2)", lineHeight: 1.4 }}>
-                Garantía Skillora — Si el vendor no entrega, te reembolsamos.
+                Garantía Octupus — Si el vendor no entrega, te reembolsamos.
               </span>
             </div>
           </div>

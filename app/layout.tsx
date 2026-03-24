@@ -6,7 +6,7 @@ import { SessionProvider } from "@/components/providers/SessionProvider";
 import "@/styles/globals.css";
 
 export const metadata: Metadata = {
-  title: "Skillora — Freelance Services Marketplace",
+title: "Octupus — Freelance Services Marketplace",
   description: "Find and hire top freelancers for any project",
 };
 
