@@ -1,4 +1,4 @@
-# Skillora - Freelance Services Marketplace
+# Freelance Services Marketplace
 
 [![Next.js](https://img.shields.io/badge/Next.js-14.2.0-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4-blue?logo=typescript)](https://typescriptlang.org/)
