@@ -38,7 +38,7 @@ export default function LoginPage() {
       hcaptchaToken: captchaToken,
       redirect: false,
     });
-    console.log("SIGNIN RESULT:", result);
+    
 
     if (result?.error) {
       const err = result.error;
