@@ -6,7 +6,7 @@ import { CartModel } from "@/models/Cart";
 import { ServiceModel } from "@/models/Service";
 
 // Stripe requires raw body — disable Next.js body parsing
-export const config = { api: { bodyParser: false } };
+export const dynamic = 'force-dynamic';
 
 // ── POST /api/payments/webhook ───────────────────────────
 export async function POST(req: NextRequest) {

@@ -1,11 +1,64 @@
-// lib/auth.ts
-
 import NextAuth, { type NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { connectDB } from "@/lib/db";
 import { UserModel } from "@/models/User";
+
+// async function verifyHCaptcha(token: string) {
+//   const secret = process.env.HCAPTCHA_SECRET;
+
+//   if (!secret) {
+//     throw new Error("Missing HCAPTCHA_SECRET");
+//   }
+
+//   const response = await fetch("https://hcaptcha.com/siteverify", {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/x-www-form-urlencoded",
+//     },
+//     body: new URLSearchParams({
+//       secret,
+//       response: token,
+//     }),
+//   });
+
+//   const data = await response.json();
+//   return data.success === true;
+// }
+
+async function verifyHCaptcha(token: string) {
+  const secret = process.env.HCAPTCHA_SECRET;
+
+  console.log("[HCAPTCHA] secret exists:", !!secret);
+  console.log("[HCAPTCHA] token exists:", !!token);
+  console.log("[HCAPTCHA] token preview:", token?.slice(0, 20));
+
+  if (!secret) {
+    throw new Error("Missing HCAPTCHA_SECRET");
+  }
+
+  try {
+    const response = await fetch("https://hcaptcha.com/siteverify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        secret,
+        response: token,
+      }),
+    });
+
+    const data = await response.json();
+    console.log("[HCAPTCHA] verify response:", data);
+
+    return data.success === true;
+  } catch (error) {
+    console.error("[HCAPTCHA] verify request failed:", error);
+    return false;
+  }
+}
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -24,33 +77,39 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        hcaptchaToken: { label: "hCaptcha Token", type: "text" },
       },
 
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
+        if (!credentials?.hcaptchaToken) {
+          throw new Error("HCAPTCHA_REQUIRED");
+        }
+
+        const captchaOk = await verifyHCaptcha(credentials.hcaptchaToken);
+        if (!captchaOk) {
+          throw new Error("HCAPTCHA_FAILED");
+        }
+
         await connectDB();
 
-        // OLD:
-        // const user = await UserModel.findOne({ email: credentials.email }).select("+password");
-        //
-        // NEW: include moderation fields so admin actions (ban/suspend/delete) actually block login
         const user = await UserModel.findOne({ email: credentials.email }).select(
           "+password role status suspendedUntil deletedAt avatar name email"
         );
 
         if (!user || !user.password) return null;
 
-       // NEW: block if deleted / banned / suspended (with explicit error codes)
-if ((user as any).deletedAt) throw new Error("ACCOUNT_DELETED");
+        if ((user as any).deletedAt) throw new Error("ACCOUNT_DELETED");
+        if ((user as any).status === "banned") throw new Error("ACCOUNT_BANNED");
 
-if ((user as any).status === "banned") throw new Error("ACCOUNT_BANNED");
-
-if ((user as any).status === "suspended") {
-  const until = (user as any).suspendedUntil as Date | undefined;
-  if (!until) throw new Error("ACCOUNT_SUSPENDED");
-  if (until > new Date()) throw new Error(`ACCOUNT_SUSPENDED_UNTIL:${until.toISOString()}`);
-}
+        if ((user as any).status === "suspended") {
+          const until = (user as any).suspendedUntil as Date | undefined;
+          if (!until) throw new Error("ACCOUNT_SUSPENDED");
+          if (until > new Date()) {
+            throw new Error(`ACCOUNT_SUSPENDED_UNTIL:${until.toISOString()}`);
+          }
+        }
 
         const isValid = await bcrypt.compare(credentials.password, user.password);
         if (!isValid) return null;
@@ -61,7 +120,7 @@ if ((user as any).status === "suspended") {
           name: user.name,
           role: (user as any).role,
           image: (user as any).avatar,
-          status: (user as any).status ?? "active", // NEW: include status
+          status: (user as any).status ?? "active",
         };
       },
     }),
@@ -69,32 +128,19 @@ if ((user as any).status === "suspended") {
 
   callbacks: {
     async jwt({ token, user, account, profile }) {
-      // OLD:
-      // if (user) {
-      //   token.role = (user as any).role ?? "buyer";
-      //   token.id = user.id;
-      // }
-
-      // NEW: keep initial assignment, plus status
       if (user) {
         token.role = (user as any).role ?? "buyer";
         token.id = (user as any).id;
         (token as any).status = (user as any).status ?? "active";
       }
 
-      // Google OAuth (same behavior, but also store status)
       if (account?.provider === "google" && profile) {
         await connectDB();
 
-        // OLD:
-        // const existing = await UserModel.findOne({ email: token.email });
-        //
-        // NEW: include role/status/deletedAt/suspendedUntil for gating + sync
         const existing = await UserModel.findOne({ email: token.email }).select(
           "role status suspendedUntil deletedAt"
         );
 
-        // NEW: if blocked, do not elevate
         if (existing) {
           if ((existing as any).deletedAt) return token;
           if ((existing as any).status === "banned") return token;
@@ -125,7 +171,6 @@ if ((user as any).status === "suspended") {
         }
       }
 
-      // NEW (critical): always sync role/status from DB so role changes take effect immediately
       if (token.email) {
         await connectDB();
         const dbUser = await UserModel.findOne({ email: token.email }).select(
@@ -146,7 +191,7 @@ if ((user as any).status === "suspended") {
       if (session.user) {
         (session.user as any).id = token.id as string;
         (session.user as any).role = token.role as string;
-        (session.user as any).status = (token as any).status as string; // NEW
+        (session.user as any).status = (token as any).status as string;
       }
       return session;
     },

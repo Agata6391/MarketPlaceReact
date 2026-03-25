@@ -61,12 +61,12 @@ export default async function CartPage() {
               </p>
             </div>
 
-            <div className="cart__header-actions">
+            {/* <div className="cart__header-actions">
               <Link href="/services">
                 <Button variant="secondary">Browse services</Button>
               </Link>
               <CheckoutButton disabled={items.length === 0} />
-            </div>
+            </div> */}
           </div>
 
           <div className="cart__grid">
