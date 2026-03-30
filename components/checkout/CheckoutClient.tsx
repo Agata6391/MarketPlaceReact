@@ -114,7 +114,7 @@ export function CheckoutClient({ items, total, userName, userEmail, userRole }: 
               : `Tu pedido fue procesado correctamente vía ${method === "card" ? "tarjeta" : "PayPal"}.`}
           </p>
           <div style={styles.successActions}>
-            <Link href={userRole === "vendor" ? "/dashboard/vendor/purchases" : "/dashboard/buyer/purchases"} style={{ ...styles.btn, ...styles.btnPrimary }}>
+            <Link href={userRole === "vendor" ? "/dashboard/vendor/orders" : "/dashboard/buyer/orders"} style={{ ...styles.btn, ...styles.btnPrimary }}>
               Ver mis órdenes
             </Link>
             <Link href="/services" style={{ ...styles.btn, ...styles.btnGhost }}>
