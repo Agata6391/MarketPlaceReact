@@ -30,9 +30,7 @@ import { UserModel } from "@/models/User";
 async function verifyHCaptcha(token: string) {
   const secret = process.env.HCAPTCHA_SECRET;
 
-  console.log("[HCAPTCHA] secret exists:", !!secret);
-  console.log("[HCAPTCHA] token exists:", !!token);
-  console.log("[HCAPTCHA] token preview:", token?.slice(0, 20));
+ 
 
   if (!secret) {
     throw new Error("Missing HCAPTCHA_SECRET");
