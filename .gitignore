@@ -68,6 +68,5 @@ Thumbs.db
 /.next
 /.next/static/chunks
 /.next
-reports/security-audit.md
-reports/security-audit-complete.md
+/reports
 TODO.md
