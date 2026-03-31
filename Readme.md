@@ -232,7 +232,7 @@ npm run start
 **Issues**: Report bugs/features.
 
 ## 📄 License
-MIT License.
+[GPL-3.0 License](LICENSE) - Copyleft: Free use/modify, but derivatives/commercial must remain open-source with attribution.
 
 ## 🙌 Acknowledgments
 - Next.js, MongoDB, Stripe teams.
