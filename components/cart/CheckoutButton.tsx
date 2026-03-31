@@ -32,7 +32,7 @@ export function CheckoutButton({ disabled, fullWidth }: Props) {
   };
 
   const onVerify = (token: string) => {
-    console.log('hCaptcha verified token:', token);
+    
     setIsVerified(true);
   };
 
@@ -41,7 +41,7 @@ export function CheckoutButton({ disabled, fullWidth }: Props) {
     setIsVerified(false);
   };
 
-  console.log('HCaptcha siteKey:', siteKey);
+ 
 
   return (
     <>
