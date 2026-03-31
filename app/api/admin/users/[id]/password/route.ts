@@ -6,20 +6,29 @@ import { UserModel } from "@/models/User";
 import { apiSuccess, apiError } from "@/lib/api-helpers";
 import bcrypt from "bcryptjs";
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+
   const session = await getServerSession(authOptions);
-  if (!session || (session.user as any).role !== "admin") return apiError("Unauthorized", 401);
+  if (!session || (session.user as any).role !== "admin") {
+    return apiError("Unauthorized", 401);
+  }
 
   const body = await req.json().catch(() => ({}));
   const password = String(body?.password ?? "");
 
-  if (password.length < 8) return apiError("Password must be at least 8 characters", 400);
+  if (password.length < 8) {
+    return apiError("Password must be at least 8 characters", 400);
+  }
 
   await connectDB();
 
   const hash = await bcrypt.hash(password, 12);
 
-  await UserModel.findByIdAndUpdate(params.id, {
+  await UserModel.findByIdAndUpdate(id, {
     $set: { password: hash, provider: "credentials" },
   });
 

@@ -8,17 +8,19 @@ import { apiSuccess, apiError } from "@/lib/api-helpers";
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+
     const session = await getServerSession(authOptions);
     if (!session) return apiError("Unauthorized", 401);
     const user = session.user as any;
     await connectDB();
 
-    const order = await OrderModel.findById(params.id)
-      .populate("buyer",   "name email avatar")
-      .populate("vendor",  "name email avatar")
+    const order = await OrderModel.findById(id)
+      .populate("buyer", "name email avatar")
+      .populate("vendor", "name email avatar")
       .populate("service", "title slug thumbnail tiers category")
       .lean();
 
@@ -27,7 +29,7 @@ export async function GET(
 
     if (
       user.role !== "admin" &&
-      o.buyer?._id?.toString()  !== user.id &&
+      o.buyer?._id?.toString() !== user.id &&
       o.vendor?._id?.toString() !== user.id
     ) return apiError("Forbidden", 403);
 
@@ -40,9 +42,11 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+
     const session = await getServerSession(authOptions);
     if (!session) return apiError("Unauthorized", 401);
 
@@ -50,23 +54,21 @@ export async function PATCH(
     const body = await req.json();
     await connectDB();
 
-    const order = await OrderModel.findById(params.id);
+    const order = await OrderModel.findById(id);
     if (!order) return apiError("Order not found", 404);
 
-    const isAdmin  = user.role === "admin";
+    const isAdmin = user.role === "admin";
     const isVendor = order.vendor?.toString() === user.id;
-    const isBuyer  = order.buyer?.toString()  === user.id;
+    const isBuyer = order.buyer?.toString() === user.id;
 
     if (!isAdmin && !isVendor && !isBuyer) return apiError("Forbidden", 403);
 
-    // ── Solicitud de cancelación (comprador) ───────────────────────────
     if (body.action === "request_cancellation") {
       if (!isBuyer && !isAdmin) return apiError("Solo el comprador puede solicitar cancelación", 403);
       const cancellable = ["pending", "paid", "in_progress", "cancellation_requested"];
       if (!cancellable.includes(order.status)) {
         return apiError("No se puede cancelar una orden en estado: " + order.status, 400);
       }
-      // Guardar estado previo para poder revertir si el vendor rechaza
       if (order.status !== "cancellation_requested") {
         (order as any).statusBeforeCancellation = order.status;
       }
@@ -76,10 +78,7 @@ export async function PATCH(
         ...((order as any).progressUpdates ?? []),
         { message: `Comprador solicitó cancelación. Motivo: "${body.reason ?? "Sin especificar"}"`, author: user.name, authorRole: "buyer", createdAt: new Date() },
       ];
-    }
-
-    // ── Vendor acepta cancelación ──────────────────────────────────────
-    else if (body.action === "accept_cancellation") {
+    } else if (body.action === "accept_cancellation") {
       if (!isVendor && !isAdmin) return apiError("Solo vendor o admin", 403);
       if ((order as any).status !== "cancellation_requested") return apiError("No hay solicitud activa", 400);
       order.status = "cancelled" as any;
@@ -87,10 +86,7 @@ export async function PATCH(
         ...((order as any).progressUpdates ?? []),
         { message: "Vendor aceptó la cancelación. Orden cancelada.", author: user.name, authorRole: isAdmin ? "admin" : "vendor", createdAt: new Date() },
       ];
-    }
-
-    // ── Vendor rechaza cancelación ─────────────────────────────────────
-    else if (body.action === "reject_cancellation") {
+    } else if (body.action === "reject_cancellation") {
       if (!isVendor && !isAdmin) return apiError("Solo vendor o admin", 403);
       if ((order as any).status !== "cancellation_requested") return apiError("No hay solicitud activa", 400);
       const prevStatus = (order as any).statusBeforeCancellation ?? "paid";
@@ -100,20 +96,14 @@ export async function PATCH(
         ...((order as any).progressUpdates ?? []),
         { message: `Vendor rechazó la cancelación.${body.reason ? " Motivo: " + body.reason : " La orden continúa activa."}`, author: user.name, authorRole: isAdmin ? "admin" : "vendor", createdAt: new Date() },
       ];
-    }
-
-    // ── Admin cancela directo ──────────────────────────────────────────
-    else if (body.action === "admin_cancel") {
+    } else if (body.action === "admin_cancel") {
       if (!isAdmin) return apiError("Solo admin", 403);
       order.status = "cancelled" as any;
       (order as any).progressUpdates = [
         ...((order as any).progressUpdates ?? []),
         { message: `Admin canceló la orden.${body.reason ? " Motivo: " + body.reason : ""}`, author: user.name, authorRole: "admin", createdAt: new Date() },
       ];
-    }
-
-    // ── Flujo normal (progreso / cambio de estado) ─────────────────────
-    else {
+    } else {
       if (body.progressNote) {
         if (!isVendor && !isAdmin) return apiError("Solo vendor o admin pueden publicar avances", 403);
         (order as any).progressUpdates = [
@@ -123,7 +113,7 @@ export async function PATCH(
       }
 
       if (body.status) {
-        const cur  = order.status;
+        const cur = order.status;
         const next = body.status;
 
         if (isVendor && !isAdmin) {
@@ -146,9 +136,9 @@ export async function PATCH(
 
     await order.save();
 
-    const updated = await OrderModel.findById(params.id)
-      .populate("buyer",   "name email avatar")
-      .populate("vendor",  "name email avatar")
+    const updated = await OrderModel.findById(id)
+      .populate("buyer", "name email avatar")
+      .populate("vendor", "name email avatar")
       .populate("service", "title slug thumbnail tiers category")
       .lean();
 

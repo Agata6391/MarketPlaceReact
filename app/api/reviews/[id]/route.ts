@@ -9,9 +9,11 @@ import { apiSuccess, apiError } from "@/lib/api-helpers";
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+
     const session = await getServerSession(authOptions);
     if (!session?.user) return apiError("Unauthorized", 401);
     const user = session.user as any;
@@ -19,20 +21,19 @@ export async function DELETE(
 
     await connectDB();
 
-    const review = await ReviewModel.findById(params.id);
+    const review = await ReviewModel.findById(id);
     if (!review) return apiError("Reseña no encontrada", 404);
 
     const serviceId = review.service;
     await review.deleteOne();
 
-    // Recalcular rating del servicio
     const remaining = await ReviewModel.find({ service: serviceId });
     const avg = remaining.length > 0
       ? remaining.reduce((s, r) => s + r.rating, 0) / remaining.length
       : 0;
 
     await ServiceModel.findByIdAndUpdate(serviceId, {
-      rating:      Math.round(avg * 10) / 10,
+      rating: Math.round(avg * 10) / 10,
       reviewCount: remaining.length,
     });
 

@@ -9,17 +9,19 @@ import { apiSuccess, apiError } from "@/lib/api-helpers";
 // DELETE /api/favorites/[id]
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+
     const session = await getServerSession(authOptions);
     if (!session?.user) return apiError("Unauthorized", 401);
-    const user   = session.user as any;
+    const user = session.user as any;
     const userId = user.id ?? user.sub;
 
     await connectDB();
 
-    const fav = await FavoriteModel.findById(params.id);
+    const fav = await FavoriteModel.findById(id);
     if (!fav) return apiError("No encontrado", 404);
     if (fav.user.toString() !== userId) return apiError("Forbidden", 403);
 

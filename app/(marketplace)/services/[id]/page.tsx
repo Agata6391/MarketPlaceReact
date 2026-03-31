@@ -1,4 +1,4 @@
-// app/(marketplace)/services/[id]/page.tsx
+// // app/(marketplace)/services/[id]/page.tsx
 import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -12,18 +12,20 @@ import "@/styles/services/services.css";
 import "@/styles/components/button.css";
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function ServiceDetailPage({ params }: PageProps) {
+  const { id } = await params;
+
   const session = await getServerSession(authOptions);
-  const user    = session?.user as any;
+  const user = session?.user as any;
 
   await connectDB();
 
   // Busca por _id o slug
   const service = await ServiceModel.findOne({
-    $or: [{ _id: params.id.length === 24 ? params.id : null }, { slug: params.id }],
+    $or: [{ _id: id.length === 24 ? id : null }, { slug: id }],
     isActive: true,
   })
     .populate("vendor", "name avatar createdAt")
@@ -38,7 +40,6 @@ export default async function ServiceDetailPage({ params }: PageProps) {
     .sort({ createdAt: -1 })
     .lean();
 
-  // Verificar si el usuario tiene este servicio en favoritos
   let isFaved = false;
   if (user?.id) {
     const fav = await FavoriteModel.findOne({ user: user.id, service: svc._id });
