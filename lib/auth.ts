@@ -49,7 +49,7 @@ async function verifyHCaptcha(token: string) {
     });
 
     const data = await response.json();
-    console.log("[HCAPTCHA] verify response:", data);
+    
 
     return data.success === true;
   } catch (error) {
